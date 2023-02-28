@@ -11,7 +11,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 		@InjectModel(UserModel) private readonly UserModel: ModelType<UserModel>
 	) {
 		super({
-			jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken,
+			jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
 			ignoreExpiration: true,
 			secretOrKey: configService.get('JWT_SECRET')
 		})

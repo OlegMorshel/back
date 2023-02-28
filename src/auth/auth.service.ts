@@ -9,7 +9,7 @@ import { compare, genSalt, hash } from 'bcryptjs'
 import { InjectModel } from 'nestjs-typegoose'
 
 import { UserId, UserModel } from 'src/user/user.model'
-import { AuthDto } from './dto'
+import { AuthDto, RefreshTokenDto } from './dto'
 
 @Injectable()
 export class AuthService {
@@ -47,6 +47,23 @@ export class AuthService {
 
 		return {
 			user: this.getUserFields(newUser),
+			...tokens
+		}
+	}
+
+	async getNewTokens({ refreshToken }: RefreshTokenDto) {
+		if (!refreshToken) throw new UnauthorizedException('Please sign in!')
+
+		const result = await this.jwtService.verifyAsync<UserModel>(refreshToken)
+
+		if (!result) throw new UnauthorizedException('Invalid token or expired!')
+
+		const user = await this.UserModel.findById(result._id)
+
+		const tokens = await this.getTokens(String(user._id))
+
+		return {
+			user: this.getUserFields(user),
 			...tokens
 		}
 	}
