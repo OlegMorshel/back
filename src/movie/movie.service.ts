@@ -71,6 +71,9 @@ export class MovieService {
 		return movie
 	}
 
+	updateRating = async (id: Types.ObjectId, rating: number) =>
+		this.MovieModel.findByIdAndUpdate(id, { rating }, { new: true }).exec()
+
 	// Admin responsibility
 
 	byId = async (_id: MovieId) => {
