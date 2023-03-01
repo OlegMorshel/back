@@ -10,6 +10,7 @@ import {
 	UsePipes,
 	ValidationPipe
 } from '@nestjs/common'
+import { Types } from 'mongoose'
 import { Auth } from 'src/auth/decorators'
 import { IdValidationPipe } from 'src/pipes'
 import { User } from './decorators'
@@ -19,12 +20,12 @@ import { UserService } from './user.service'
 
 @Controller('users')
 export class UserController {
-	constructor(private readonly userService: UserService) {}
+	constructor(private readonly UserService: UserService) {}
 
 	@Get('profile')
 	@Auth()
 	async getProfile(@User('_id') _id: UserId): Promise<UserModel> {
-		return this.userService.byId(_id)
+		return this.UserService.byId(_id)
 	}
 
 	@UsePipes(new ValidationPipe())
@@ -32,8 +33,27 @@ export class UserController {
 	@HttpCode(200)
 	@Auth()
 	async updateProfile(@User('_id') _id: UserId, @Body() dto: UpdateUserDto) {
-		return this.userService.updateProfile(_id, dto)
+		return this.UserService.updateProfile(_id, dto)
 	}
+
+	@Get('profile/favorites')
+	@HttpCode(200)
+	@Auth()
+	async getFavorites(@User('_id') _id: Types.ObjectId) {
+		return this.UserService.getFavoriteMovies(_id)
+	}
+
+	@Put('profile/favorites')
+	@HttpCode(200)
+	@Auth()
+	async updateFavorites(
+		@Body() { movieId }: { movieId: Types.ObjectId },
+		@User() user: UserModel
+	) {
+		return this.UserService.toggleFavorite(movieId, user)
+	}
+
+	// ADMIN
 
 	@UsePipes(new ValidationPipe())
 	@Put(':id')
@@ -43,28 +63,28 @@ export class UserController {
 		@Param('id', IdValidationPipe) _id: UserId,
 		@Body() dto: UpdateUserDto
 	) {
-		return this.userService.updateProfile(_id, dto)
+		return this.UserService.updateProfile(_id, dto)
 	}
 
 	@Get('count')
 	@HttpCode(200)
 	@Auth('admin')
 	async getCountUsers() {
-		return this.userService.getCount()
+		return this.UserService.getCount()
 	}
 
 	@Get()
 	@HttpCode(200)
 	@Auth('admin')
 	async getUsers(@Query('searchTerm') searchTerm?: string) {
-		return this.userService.getAll(searchTerm)
+		return this.UserService.getAll(searchTerm)
 	}
 
 	@Get(':id')
 	@HttpCode(200)
 	@Auth('admin')
 	async getUser(@Param('id', IdValidationPipe) _id: UserId) {
-		return this.userService.byId(_id)
+		return this.UserService.byId(_id)
 	}
 
 	@UsePipes(new ValidationPipe())
@@ -72,6 +92,6 @@ export class UserController {
 	@HttpCode(200)
 	@Auth('admin')
 	async deleteUser(@Param('id', IdValidationPipe) _id: UserId) {
-		return this.userService.delete(_id)
+		return this.UserService.delete(_id)
 	}
 }
