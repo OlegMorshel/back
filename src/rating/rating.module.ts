@@ -3,6 +3,8 @@ import { TypegooseModule } from 'nestjs-typegoose'
 import { MovieModel } from 'src/movie/movie.model'
 import { MovieModule } from 'src/movie/movie.module'
 import { MovieService } from 'src/movie/movie.service'
+import { TelegramModule } from 'src/telegram/telegram.module'
+import { TelegramService } from 'src/telegram/telegram.service'
 import { RatingController } from './rating.controller'
 import { RatingModel } from './rating.model'
 import { RatingService } from './rating.service'
@@ -13,9 +15,10 @@ import { RatingService } from './rating.service'
 			{ typegooseClass: RatingModel, schemaOptions: { collection: 'Rating' } },
 			{ typegooseClass: MovieModel, schemaOptions: { collection: 'Movie' } }
 		]),
-		MovieModule
+		MovieModule,
+		TelegramModule
 	],
 	controllers: [RatingController],
-	providers: [RatingService, MovieService]
+	providers: [RatingService, MovieService, TelegramService]
 })
 export class RatingModule {}
