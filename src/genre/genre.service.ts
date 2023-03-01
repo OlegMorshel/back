@@ -13,6 +13,7 @@ export class GenreService {
 
 	bySlug = async (slug: string): Promise<IPublicGenre> => {
 		const genre = await this.GenreModel.findOne({ slug }).exec()
+		if (!genre) throw new NotFoundException('Genre not found')
 		return this.getPublicGenreFormat(genre)
 	}
 
