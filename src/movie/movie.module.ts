@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common'
+import { ConfigModule, ConfigService } from '@nestjs/config'
 import { TypegooseModule } from 'nestjs-typegoose'
 import { TelegramModule } from 'src/telegram/telegram.module'
 import { TelegramService } from 'src/telegram/telegram.service'
@@ -11,10 +12,11 @@ import { MovieService } from './movie.service'
 		TypegooseModule.forFeature([
 			{ typegooseClass: MovieModel, schemaOptions: { collection: 'Movie' } }
 		]),
-		TelegramModule
+		TelegramModule,
+		ConfigModule
 	],
 	controllers: [MovieController],
-	providers: [MovieService, TelegramService],
+	providers: [MovieService, TelegramService, ConfigService],
 	exports: [MovieService]
 })
 export class MovieModule {}

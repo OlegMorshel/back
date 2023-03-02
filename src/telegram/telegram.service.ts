@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { getTelegramConfig } from 'src/config/telegram.config'
 import { Telegraf } from 'telegraf'
 import { ExtraReplyMessage } from 'telegraf/typings/telegram-types'
@@ -9,8 +10,8 @@ export class TelegramService {
 	bot: Telegraf
 	options: ITelegram
 
-	constructor() {
-		this.options = getTelegramConfig()
+	constructor(private readonly ConfigService: ConfigService) {
+		this.options = getTelegramConfig(ConfigService)
 		this.bot = new Telegraf(this.options.token)
 	}
 

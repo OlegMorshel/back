@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common'
+import { ConfigModule, ConfigService } from '@nestjs/config'
 import { TypegooseModule } from 'nestjs-typegoose'
 import { MovieModel } from 'src/movie/movie.model'
 import { MovieModule } from 'src/movie/movie.module'
@@ -16,9 +17,10 @@ import { RatingService } from './rating.service'
 			{ typegooseClass: MovieModel, schemaOptions: { collection: 'Movie' } }
 		]),
 		MovieModule,
-		TelegramModule
+		TelegramModule,
+		ConfigModule
 	],
 	controllers: [RatingController],
-	providers: [RatingService, MovieService, TelegramService]
+	providers: [RatingService, MovieService, TelegramService, ConfigService]
 })
 export class RatingModule {}
