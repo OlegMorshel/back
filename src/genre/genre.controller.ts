@@ -11,6 +11,7 @@ import {
 	UsePipes,
 	ValidationPipe
 } from '@nestjs/common'
+import { Types } from 'mongoose'
 import { Auth } from 'src/auth/decorators'
 import { IdValidationPipe } from 'src/pipes'
 import { UpdateGenreDto } from './dto'
@@ -53,7 +54,10 @@ export class GenreController {
 	@Put(':id')
 	@HttpCode(200)
 	@Auth('admin')
-	async update(@Param('id') _id: GenreId, @Body() dto: UpdateGenreDto) {
+	async update(
+		@Param('id', IdValidationPipe) _id: Types.ObjectId,
+		@Body() dto: UpdateGenreDto
+	) {
 		return this.GenreService.update(_id, dto)
 	}
 

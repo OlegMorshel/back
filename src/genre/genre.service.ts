@@ -1,14 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { ModelType } from '@typegoose/typegoose/lib/types'
+import { Types } from 'mongoose'
 import { InjectModel } from 'nestjs-typegoose'
+import { MovieService } from 'src/movie/movie.service'
 import { CreateGenreDto, UpdateGenreDto } from './dto'
-import { IPublicGenre } from './genre.interface'
+import { ICollection, IPublicGenre } from './genre.interface'
 import { GenreId, GenreModel } from './genre.model'
 
 @Injectable()
 export class GenreService {
 	constructor(
-		@InjectModel(GenreModel) private readonly GenreModel: ModelType<GenreModel>
+		@InjectModel(GenreModel) private readonly GenreModel: ModelType<GenreModel>,
+		private readonly MovieService: MovieService
 	) {}
 
 	bySlug = async (slug: string): Promise<IPublicGenre> => {
@@ -45,9 +48,21 @@ export class GenreService {
 	getCollections = async () => {
 		const genres = await this.getAll()
 
-		const collections = genres
+		const collections = await Promise.all(
+			genres.map(async (genre) => {
+				const moviesByGenre = await this.MovieService.byGenres([genre._id])
 
-		// Todo: write later
+				const result: ICollection = {
+					_id: String(genre._id),
+					image: moviesByGenre[0]?.bigPoster,
+					slug: genre.slug,
+					title: genre.name
+				}
+
+				return result
+			})
+		)
+
 		return collections
 	}
 
@@ -61,7 +76,7 @@ export class GenreService {
 		return this.getPublicGenreFormat(genre)
 	}
 
-	update = async (_id: GenreId, dto: UpdateGenreDto) => {
+	update = async (_id: Types.ObjectId, dto: UpdateGenreDto) => {
 		const genre = await this.GenreModel.findByIdAndUpdate(_id, dto, {
 			new: true
 		}).exec()
